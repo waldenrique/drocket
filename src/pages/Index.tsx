@@ -406,36 +406,276 @@ const Index = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-primary/5">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="flex items-center justify-center mb-6">
-            <Link2 className="h-12 w-12 text-primary mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              RocketLink
-            </h1>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+        {/* Header */}
+        <header className="border-b bg-background/80 backdrop-blur-sm">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center">
+              <Link2 className="h-6 w-6 text-primary mr-2" />
+              <h1 className="text-xl font-bold">RocketLink</h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate("/pricing")}
+                className="text-primary hover:text-primary/80"
+              >
+                Preços
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/auth")}
+              >
+                Entrar
+              </Button>
+              <Button 
+                onClick={() => navigate("/auth")}
+              >
+                Começar
+              </Button>
+            </div>
           </div>
-          <h2 className="text-2xl font-semibold mb-4">Crie a sua página de links</h2>
-          <p className="text-muted-foreground mb-8">
-            Uma plataforma simples e poderosa para centralizar todos os seus links numa página personalizada.
-          </p>
-          <div className="space-y-3">
-            <Button 
-              onClick={() => navigate("/auth")} 
-              size="lg"
-              className="w-full"
-            >
-              Começar agora
-            </Button>
-            <Button 
-              onClick={() => navigate("/pricing")} 
-              variant="outline"
-              size="lg"
-              className="w-full"
-            >
-              Ver Planos e Preços
-            </Button>
+        </header>
+
+        {/* Hero Section */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto text-center max-w-4xl">
+            <div className="animate-fade-in">
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+                Todos os seus links
+                <br />
+                <span className="text-foreground">numa só página</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Crie uma página profissional que centraliza todos os seus links importantes. 
+                Simples, elegante e poderoso.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/auth")}
+                  className="text-lg px-8 py-6 hover-scale"
+                >
+                  Começar Gratuitamente
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  onClick={() => navigate("/pricing")}
+                  className="text-lg px-8 py-6 hover-scale"
+                >
+                  Ver Planos Premium
+                </Button>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                ✨ Sem cartão de crédito • 15 dias grátis no Premium
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-20 px-4 bg-muted/30">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">Porquê escolher o RocketLink?</h2>
+              <p className="text-xl text-muted-foreground">
+                A plataforma mais completa para gerir os seus links online
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center p-6 rounded-2xl bg-background/50 backdrop-blur-sm hover-scale">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Link2 className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Setup em Minutos</h3>
+                <p className="text-muted-foreground">
+                  Configure a sua página em menos de 5 minutos. Interface intuitiva e fácil de usar.
+                </p>
+              </div>
+              
+              <div className="text-center p-6 rounded-2xl bg-background/50 backdrop-blur-sm hover-scale">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Eye className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Design Profissional</h3>
+                <p className="text-muted-foreground">
+                  Templates modernos e customizáveis que fazem a diferença na sua presença online.
+                </p>
+              </div>
+              
+              <div className="text-center p-6 rounded-2xl bg-background/50 backdrop-blur-sm hover-scale">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ExternalLink className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Analytics Avançado</h3>
+                <p className="text-muted-foreground">
+                  Acompanhe cliques, origem do tráfego e performance dos seus links em tempo real.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* How it Works */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto max-w-4xl">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">Como funciona?</h2>
+              <p className="text-xl text-muted-foreground">
+                Três passos simples para ter a sua página online
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  1
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Crie a sua conta</h3>
+                <p className="text-muted-foreground">
+                  Registe-se gratuitamente e comece imediatamente
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  2
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Adicione os seus links</h3>
+                <p className="text-muted-foreground">
+                  Personalize a sua página e adicione todos os links importantes
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  3
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Partilhe com o mundo</h3>
+                <p className="text-muted-foreground">
+                  Use o seu link personalizado em qualquer lugar
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h2 className="text-4xl font-bold mb-4">
+              Pronto para criar a sua página de links?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-8">
+              Junte-se a milhares de criadores, empresários e profissionais que já usam o RocketLink
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/auth")}
+                className="text-lg px-8 py-6 hover-scale"
+              >
+                Começar Gratuitamente
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={() => navigate("/pricing")}
+                className="text-lg px-8 py-6 hover-scale"
+              >
+                Ver Todos os Planos
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold mb-4">O que dizem os nossos utilizadores</h2>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <div>
+                    <div className="font-semibold">Sofia Costa</div>
+                    <div className="text-sm text-muted-foreground">Influencer Digital</div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "O RocketLink transformou a forma como partilho os meus links. Interface simples e resultado profissional!"
+                </p>
+              </div>
+              
+              <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <div>
+                    <div className="font-semibold">João Silva</div>
+                    <div className="text-sm text-muted-foreground">Empreendedor</div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "Os analytics do RocketLink ajudaram-me a entender melhor o meu público. Recomendo!"
+                </p>
+              </div>
+              
+              <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <div>
+                    <div className="font-semibold">Maria Santos</div>
+                    <div className="text-sm text-muted-foreground">Content Creator</div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "Finalmente uma solução completa para gerir todos os meus links. O suporte é excelente!"
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-20 px-4 bg-primary text-primary-foreground">
+          <div className="container mx-auto text-center max-w-3xl">
+            <h2 className="text-4xl font-bold mb-4">
+              Não perca mais tempo
+            </h2>
+            <p className="text-xl opacity-90 mb-8">
+              Crie a sua página de links profissional hoje mesmo. É grátis para começar!
+            </p>
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => navigate("/auth")}
+              className="text-lg px-8 py-6 hover-scale"
+            >
+              Criar Conta Grátis
+            </Button>
+            <div className="mt-4 text-sm opacity-75">
+              Sem compromisso • Cancele quando quiser
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t py-8 px-4">
+          <div className="container mx-auto text-center">
+            <div className="flex items-center justify-center mb-4">
+              <Link2 className="h-6 w-6 text-primary mr-2" />
+              <span className="font-bold">RocketLink</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              © 2024 RocketLink. Todos os direitos reservados.
+            </p>
+          </div>
+        </footer>
       </div>
     );
   }

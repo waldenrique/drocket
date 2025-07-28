@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp, Crown, Copy } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,6 +58,7 @@ const Index = () => {
   const { user, isPremium } = useSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<PageFormData>();
   const { register: registerLink, handleSubmit: handleSubmitLink, formState: { errors: linkErrors }, setValue: setLinkValue, reset: resetLink } = useForm<LinkFormData>();
@@ -447,23 +450,24 @@ const Index = () => {
               </button>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageSelector />
               <Button 
                 variant="ghost" 
                 onClick={() => navigate("/pricing")}
                 className="text-primary hover:text-primary/80"
               >
-                Preços
+                {t('pricing')}
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/auth")}
               >
-                Entrar
+                {t('login')}
               </Button>
               <Button 
                 onClick={() => navigate("/auth")}
               >
-                Começar
+                {t('getStarted')}
               </Button>
             </div>
           </div>
@@ -474,13 +478,10 @@ const Index = () => {
           <div className="container mx-auto text-center max-w-4xl">
             <div className="animate-fade-in">
               <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                Todos os seus links
-                <br />
-                <span className="text-foreground">numa só página</span>
+                {t('heroTitle')}
               </h1>
               <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Crie uma página profissional que centraliza todos os seus links importantes. 
-                Simples, elegante e poderoso.
+                {t('heroSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <Button 
@@ -488,7 +489,7 @@ const Index = () => {
                   onClick={() => navigate("/auth")}
                   className="text-lg px-8 py-6 hover-scale"
                 >
-                  Começar Gratuitamente
+                  {t('getStarted')}
                 </Button>
                 <Button 
                   size="lg" 
@@ -496,7 +497,7 @@ const Index = () => {
                   onClick={() => navigate("/pricing")}
                   className="text-lg px-8 py-6 hover-scale"
                 >
-                  Ver Planos Premium
+                  {t('pricing')}
                 </Button>
               </div>
               <div className="text-sm text-muted-foreground">

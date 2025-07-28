@@ -81,11 +81,11 @@ export const ImageUpload = ({
       return;
     }
 
-    // Validate file size (9MB max)
-    if (file.size > 9 * 1024 * 1024) {
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
       toast({
         title: "Erro",
-        description: "A imagem deve ter no máximo 9MB.",
+        description: "A imagem deve ter no máximo 2MB.",
         variant: "destructive"
       });
       return;
@@ -257,7 +257,7 @@ export const ImageUpload = ({
           </div>
 
           <p className="text-xs text-muted-foreground">
-            Recomendado: imagem quadrada, máximo 9MB. A imagem será redimensionada automaticamente.
+            Recomendado: imagem quadrada, máximo 2MB. A imagem será redimensionada automaticamente.
           </p>
         </div>
       </div>

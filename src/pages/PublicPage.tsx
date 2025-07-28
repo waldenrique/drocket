@@ -135,24 +135,24 @@ const PublicPage = () => {
 
   return (
     <div 
-      className="min-h-screen py-8 px-4"
+      className="min-h-screen py-6 sm:py-8 px-4"
       style={backgroundStyle}
     >
-      <div className="max-w-md mx-auto">
+      <div className="max-w-sm sm:max-w-md mx-auto">
         {/* Page Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2 text-white drop-shadow-lg">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold mb-2 text-white drop-shadow-lg">
             {page.title}
           </h1>
           {page.description && (
-            <p className="text-white/90 drop-shadow">
+            <p className="text-sm sm:text-base text-white/90 drop-shadow">
               {page.description}
             </p>
           )}
         </div>
 
         {/* Links */}
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {links.length === 0 ? (
             <Card className="bg-white/10 backdrop-blur border-white/20">
               <CardContent className="p-6 text-center">
@@ -166,22 +166,22 @@ const PublicPage = () => {
                 className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 transition-all cursor-pointer group"
                 onClick={() => handleLinkClick(link)}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                       {link.icon && (
-                        <span className="text-2xl">{link.icon}</span>
+                        <span className="text-xl sm:text-2xl flex-shrink-0">{link.icon}</span>
                       )}
-                      <div>
-                        <h3 className="font-medium text-white group-hover:text-white/90">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-white/90 truncate">
                           {link.title}
                         </h3>
-                        <p className="text-sm text-white/60 truncate">
+                        <p className="text-xs sm:text-sm text-white/60 truncate">
                           {link.url.replace(/^https?:\/\//, '')}
                         </p>
                       </div>
                     </div>
-                    <ExternalLink className="h-5 w-5 text-white/60 group-hover:text-white/80" />
+                    <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5 text-white/60 group-hover:text-white/80 flex-shrink-0" />
                   </div>
                 </CardContent>
               </Card>
@@ -190,8 +190,8 @@ const PublicPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12">
-          <p className="text-white/60 text-sm">
+        <div className="text-center mt-8 sm:mt-12">
+          <p className="text-white/60 text-xs sm:text-sm">
             Criado com LinkBio
           </p>
         </div>

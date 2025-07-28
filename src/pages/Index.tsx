@@ -422,10 +422,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link2 className="h-6 w-6 text-primary mr-2" />
-            <h1 className="text-xl font-bold">LinkBio</h1>
+            <h1 className="text-lg sm:text-xl font-bold">LinkBio</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
               Olá, {user.user_metadata?.display_name || user.email}
             </span>
             <Button 
@@ -433,17 +433,17 @@ const Index = () => {
               size="sm" 
               onClick={handleSignOut}
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sair
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Sair</span>
             </Button>
           </div>
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">Bem-vindo ao seu painel</h2>
-          <p className="text-xl text-muted-foreground">
+      <main className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Bem-vindo ao seu painel</h2>
+          <p className="text-lg sm:text-xl text-muted-foreground">
             Gerir a sua página de links
           </p>
         </div>
@@ -453,19 +453,20 @@ const Index = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4 sm:gap-6">
             {/* Estado da página */}
             {!showForm && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>A sua página LinkBio</span>
-                    <div className="flex gap-2">
+                  <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <span className="text-lg sm:text-xl">A sua página LinkBio</span>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       {page && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open(`/${page.slug}`, '_blank')}
+                          className="w-full sm:w-auto"
                         >
                           <Eye className="h-4 w-4 mr-2" />
                           Ver página
@@ -475,6 +476,7 @@ const Index = () => {
                         variant="outline"
                         size="sm"
                         onClick={handleEditClick}
+                        className="w-full sm:w-auto"
                       >
                         <Edit className="h-4 w-4 mr-2" />
                         {page ? 'Editar' : 'Criar'}

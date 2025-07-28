@@ -161,7 +161,7 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
           <TabsContent value="colors" className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Cores predefinidas</Label>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
                 {predefinedColors.map((color) => (
                   <button
                     key={color.value}
@@ -180,7 +180,7 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
             
             <div>
               <Label htmlFor="custom-color" className="text-sm font-medium">Cor personalizada</Label>
-              <div className="flex gap-2 mt-2">
+              <div className="flex flex-col sm:flex-row gap-2 mt-2">
                 <Input
                   id="custom-color"
                   type="color"
@@ -208,7 +208,7 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
           <TabsContent value="gradients" className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Gradientes predefinidos</Label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {predefinedGradients.map((gradient) => (
                   <button
                     key={gradient.name}

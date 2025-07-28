@@ -219,7 +219,7 @@ const Auth = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
+            <Tabs defaultValue={selectedPlan ? "signup" : "signin"} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="signin">Login</TabsTrigger>
                 <TabsTrigger value="signup">Registo</TabsTrigger>

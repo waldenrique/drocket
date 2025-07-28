@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp, Crown } from "lucide-react";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp, Crown, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -964,27 +964,52 @@ const Index = () => {
                           }
                         </CardDescription>
                       </div>
-                      <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-                        {page && (
-                          <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => window.open(`/${page.slug}`, '_blank')}
-                            className="shadow-md hover:shadow-lg transition-shadow"
-                          >
-                            <Eye className="h-5 w-5 mr-2" />
-                            Ver Página de Divulgação
-                          </Button>
-                        )}
-                        <Button
-                          size="lg"
-                          onClick={handleEditClick}
-                          className="shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-primary to-primary/90"
-                        >
-                          <Edit className="h-5 w-5 mr-2" />
-                          {page ? 'Editar Página' : 'Criar Página'}
-                        </Button>
-                      </div>
+                       <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                         {page && (
+                           <Button
+                             variant="outline"
+                             size="lg"
+                             onClick={() => window.open(`/${page.slug}`, '_blank')}
+                             className="shadow-md hover:shadow-lg transition-shadow"
+                           >
+                             <Eye className="h-5 w-5 mr-2" />
+                             Ver Página de Divulgação
+                           </Button>
+                         )}
+                         <Button
+                           size="lg"
+                           onClick={handleEditClick}
+                           className="shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-primary to-primary/90"
+                         >
+                           <Edit className="h-5 w-5 mr-2" />
+                           {page ? 'Editar Página' : 'Criar Página'}
+                         </Button>
+                         {page && (
+                           <Button
+                             size="lg"
+                             onClick={() => {
+                               const url = `${window.location.origin}/${page.slug}`;
+                               navigator.clipboard.writeText(url).then(() => {
+                                 toast({
+                                   variant: "success",
+                                   title: "Link copiado!",
+                                   description: "O link para sua bio foi copiado para a área de transferência."
+                                 });
+                               }).catch(() => {
+                                 toast({
+                                   variant: "destructive",
+                                   title: "Erro ao copiar",
+                                   description: "Não foi possível copiar o link."
+                                 });
+                               });
+                             }}
+                             className="shadow-md hover:shadow-lg transition-shadow bg-orange-500 hover:bg-orange-600 text-white"
+                           >
+                             <Copy className="h-5 w-5 mr-2" />
+                             Copiar Link para Bio
+                           </Button>
+                         )}
+                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="relative">

@@ -800,9 +800,14 @@ const Index = () => {
               <UserIcon className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Perfil</span>
             </Button>
-            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/profile")}
+              className="text-xs sm:text-sm text-muted-foreground hidden sm:block p-1 h-auto hover:text-foreground transition-colors"
+            >
               Olá, {user.user_metadata?.display_name || user.email}
-            </span>
+            </Button>
             <Button 
               variant="outline" 
               size="sm" 

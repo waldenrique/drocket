@@ -45,24 +45,30 @@ serve(async (req) => {
     }
     logStep("Customer check completed", { customerId, exists: !!customerId });
 
-    // Define plan details
-    const planDetails = {
-      monthly: {
-        price: 990,
-        name: "Premium Monthly",
-        description: "Premium plan - €9.90/month with 15-day free trial"
-      },
-      yearly: {
-        price: 4990,
-        name: "Premium Yearly", 
-        description: "Premium plan - €49.90/year with 15-day free trial"
-      }
+    // Define product IDs from Stripe
+    const productIds = {
+      monthly: "prod_SlPQZzYntwtEO2",
+      yearly: "prod_SlPR2RREUt9KJa"
     };
 
-    const selectedPlan = planDetails[plan as keyof typeof planDetails];
-    if (!selectedPlan) {
+    const selectedProductId = productIds[plan as keyof typeof productIds];
+    if (!selectedProductId) {
       throw new Error("Invalid plan selected");
     }
+
+    // Get the price for the selected product
+    const prices = await stripe.prices.list({
+      product: selectedProductId,
+      active: true,
+      limit: 1
+    });
+
+    if (prices.data.length === 0) {
+      throw new Error("No active price found for the selected product");
+    }
+
+    const priceId = prices.data[0].id;
+    logStep("Using existing product and price", { productId: selectedProductId, priceId });
 
     // Create checkout session with trial
     const session = await stripe.checkout.sessions.create({
@@ -70,17 +76,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data: {
-            currency: "eur",
-            product_data: { 
-              name: selectedPlan.name,
-              description: selectedPlan.description
-            },
-            unit_amount: selectedPlan.price,
-            recurring: { 
-              interval: plan === "yearly" ? "year" : "month"
-            },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],

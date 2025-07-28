@@ -192,7 +192,7 @@ const PublicPage = () => {
         {/* Footer */}
         <div className="text-center mt-8 sm:mt-12">
           <p className="text-white/60 text-xs sm:text-sm">
-            Criado com LinkBio
+            Criado com RocketLink
           </p>
         </div>
       </div>

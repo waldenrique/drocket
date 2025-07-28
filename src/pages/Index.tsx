@@ -397,7 +397,7 @@ const Index = () => {
           <div className="flex items-center justify-center mb-6">
             <Link2 className="h-12 w-12 text-primary mr-3" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              LinkBio
+              RocketLink
             </h1>
           </div>
           <h2 className="text-2xl font-semibold mb-4">Crie a sua página de links</h2>
@@ -422,7 +422,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center">
             <Link2 className="h-6 w-6 text-primary mr-2" />
-            <h1 className="text-lg sm:text-xl font-bold">LinkBio</h1>
+            <h1 className="text-lg sm:text-xl font-bold">RocketLink</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
@@ -459,7 +459,7 @@ const Index = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <span className="text-lg sm:text-xl">A sua página LinkBio</span>
+                    <span className="text-lg sm:text-xl">A sua página RocketLink</span>
                     <div className="flex flex-col sm:flex-row gap-2">
                       {page && (
                         <Button
@@ -493,7 +493,7 @@ const Index = () => {
                       </div>
                       <div>
                         <Label className="text-sm font-medium">URL</Label>
-                        <p className="text-muted-foreground">linkbio.com/{page.slug}</p>
+                        <p className="text-muted-foreground">rocketlink.com/{page.slug}</p>
                       </div>
                       {page.description && (
                         <div>
@@ -511,7 +511,7 @@ const Index = () => {
                       <Plus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-lg font-medium mb-2">Ainda não tem uma página</h3>
                       <p className="text-muted-foreground mb-4">
-                        Crie a sua primeira página LinkBio para começar a partilhar os seus links.
+                        Crie a sua primeira página RocketLink para começar a partilhar os seus links.
                       </p>
                       <Button onClick={handleEditClick}>
                         <Plus className="h-4 w-4 mr-2" />
@@ -529,7 +529,7 @@ const Index = () => {
                 <CardHeader>
                   <CardTitle>{page ? 'Editar página' : 'Criar nova página'}</CardTitle>
                   <CardDescription>
-                    {page ? 'Atualize os detalhes da sua página' : 'Configure a sua página LinkBio'}
+                    {page ? 'Atualize os detalhes da sua página' : 'Configure a sua página RocketLink'}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -553,7 +553,7 @@ const Index = () => {
                       <Label htmlFor="slug">URL personalizada *</Label>
                       <div className="flex">
                         <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                          linkbio.com/
+                          rocketlink.com/
                         </span>
                         <Input
                           id="slug"

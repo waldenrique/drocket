@@ -149,7 +149,7 @@ const Auth = () => {
           <div className="flex items-center justify-center mb-4">
             <Link2 className="h-8 w-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              LinkBio
+              RocketLink
             </h1>
           </div>
           <CardTitle>Bem-vindo</CardTitle>

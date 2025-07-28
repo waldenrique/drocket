@@ -147,7 +147,7 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
           Personalização
         </CardTitle>
         <CardDescription>
-          Personalize o visual da sua página LinkBio
+          Personalize o visual da sua página RocketLink
         </CardDescription>
       </CardHeader>
       <CardContent>

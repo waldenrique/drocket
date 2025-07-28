@@ -233,7 +233,7 @@ const Pricing = () => {
           <Card className="relative">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
-                2 meses grátis
+                6 meses grátis
               </Badge>
             </div>
             <CardHeader>

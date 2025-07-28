@@ -973,7 +973,7 @@ const Index = () => {
                             className="shadow-md hover:shadow-lg transition-shadow"
                           >
                             <Eye className="h-5 w-5 mr-2" />
-                            Ver Página ao Vivo
+                            Ver Página de Divulgação
                           </Button>
                         )}
                         <Button

@@ -9,6 +9,7 @@ import PublicPage from "./pages/PublicPage";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import Profile from "./pages/Profile";
+import Analytics from "./pages/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/:slug" element={<PublicPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

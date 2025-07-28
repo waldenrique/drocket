@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Session } from "@supabase/supabase-js";
-import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon } from "lucide-react";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import PageCustomization from "@/components/PageCustomization";
 import ImageUpload from "@/components/ImageUpload";
 import TrialBanner from "@/components/TrialBanner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 // Import testimonial images
 import testimonialWoman1 from "@/assets/testimonial-woman-1.jpg";
@@ -43,8 +44,6 @@ interface Link {
 }
 
 const Index = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -54,6 +53,7 @@ const Index = () => {
   const [linksLoading, setLinksLoading] = useState(false);
   const [showLinkForm, setShowLinkForm] = useState(false);
   const [editingLink, setEditingLink] = useState<Link | null>(null);
+  const { user, isPremium } = useSubscription();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -61,36 +61,13 @@ const Index = () => {
   const { register: registerLink, handleSubmit: handleSubmitLink, formState: { errors: linkErrors }, setValue: setLinkValue, reset: resetLink } = useForm<LinkFormData>();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-        
-        // Load user's page after auth
-        if (session?.user) {
-          setTimeout(() => {
-            loadUserPage(session.user.id);
-          }, 0);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    if (user) {
       setLoading(false);
-      
-      // Load user's page if user exists
-      if (session?.user) {
-        loadUserPage(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+      loadUserPage(user.id);
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   const loadUserPage = async (userId: string) => {
     setPageLoading(true);
@@ -791,6 +768,17 @@ const Index = () => {
             >
               Planos
             </Button>
+            {isPremium && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => navigate("/analytics")}
+                className="text-primary hover:text-primary/80"
+              >
+                <BarChart3 className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="sm" 

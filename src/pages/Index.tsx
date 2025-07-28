@@ -439,6 +439,14 @@ const Index = () => {
             <h1 className="text-lg sm:text-xl font-bold">RocketLink</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/pricing")}
+              className="text-primary hover:text-primary/80"
+            >
+              Planos
+            </Button>
             <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
               Olá, {user.user_metadata?.display_name || user.email}
             </span>

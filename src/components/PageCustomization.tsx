@@ -82,22 +82,57 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
     });
   };
 
+  const resizeImage = (file: File, maxWidth: number = 1200, maxHeight: number = 1200, quality: number = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(
+          (blob) => {
+            const resizedFile = new File([blob!], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(resizedFile);
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
       
       const file = event.target.files?.[0];
       if (!file) return;
-
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Erro",
-          description: "O arquivo deve ter no máximo 5MB.",
-          variant: "destructive",
-        });
-        return;
-      }
 
       // Check file type
       if (!file.type.startsWith('image/')) {
@@ -109,12 +144,35 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
         return;
       }
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${page.id}-${Date.now()}.${fileExt}`;
+      // Resize image if needed
+      let processedFile = file;
+      
+      // If file is larger than 2MB or dimensions are too big, resize it
+      if (file.size > 2 * 1024 * 1024) {
+        processedFile = await resizeImage(file, 1200, 1200, 0.7);
+        
+        // If still too large after compression, try again with lower quality
+        if (processedFile.size > 2 * 1024 * 1024) {
+          processedFile = await resizeImage(file, 800, 800, 0.5);
+        }
+      }
+
+      // Final check - if still too large, reject
+      if (processedFile.size > 2 * 1024 * 1024) {
+        toast({
+          title: "Erro",
+          description: "Não foi possível reduzir a imagem para menos de 2MB. Tente uma imagem menor.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const fileExt = 'jpg'; // Always save as JPG after processing
+      const fileName = `${page.user_id}/${page.id}-${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('backgrounds')
-        .upload(fileName, file);
+        .upload(fileName, processedFile);
 
       if (uploadError) throw uploadError;
 
@@ -125,6 +183,11 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
       updatePageStyle({
         background_type: 'image',
         background_value: publicUrl
+      });
+
+      toast({
+        title: "Sucesso!",
+        description: "Imagem carregada e otimizada automaticamente.",
       });
 
     } catch (error) {
@@ -264,7 +327,7 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
                       <Upload className="h-8 w-8 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Clique para fazer upload</p>
-                        <p className="text-xs text-muted-foreground">PNG, JPG até 5MB</p>
+                        <p className="text-xs text-muted-foreground">PNG, JPG até 2MB (redimensionamento automático)</p>
                       </div>
                     </>
                   )}

@@ -13,6 +13,12 @@ import { useForm } from "react-hook-form";
 import PageCustomization from "@/components/PageCustomization";
 import ImageUpload from "@/components/ImageUpload";
 
+// Import testimonial images
+import testimonialWoman1 from "@/assets/testimonial-woman-1.jpg";
+import testimonialMan1 from "@/assets/testimonial-man-1.jpg";
+import testimonialMan2 from "@/assets/testimonial-man-2.jpg";
+import testimonialWoman2 from "@/assets/testimonial-woman-2.jpg";
+
 interface PageFormData {
   title: string;
   slug: string;
@@ -603,10 +609,14 @@ const Index = () => {
               <h2 className="text-4xl font-bold mb-4">O que dizem os nossos utilizadores</h2>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
                 <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <img 
+                    src={testimonialWoman1} 
+                    alt="Sofia Costa" 
+                    className="w-12 h-12 rounded-full object-cover mr-3"
+                  />
                   <div>
                     <div className="font-semibold">Sofia Costa</div>
                     <div className="text-sm text-muted-foreground">Influencer Digital</div>
@@ -619,7 +629,11 @@ const Index = () => {
               
               <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
                 <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <img 
+                    src={testimonialMan1} 
+                    alt="João Silva" 
+                    className="w-12 h-12 rounded-full object-cover mr-3"
+                  />
                   <div>
                     <div className="font-semibold">João Silva</div>
                     <div className="text-sm text-muted-foreground">Empreendedor</div>
@@ -632,14 +646,35 @@ const Index = () => {
               
               <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
                 <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-primary/20 rounded-full mr-3"></div>
+                  <img 
+                    src={testimonialMan2} 
+                    alt="Pedro Santos" 
+                    className="w-12 h-12 rounded-full object-cover mr-3"
+                  />
                   <div>
-                    <div className="font-semibold">Maria Santos</div>
+                    <div className="font-semibold">Pedro Santos</div>
                     <div className="text-sm text-muted-foreground">Content Creator</div>
                   </div>
                 </div>
                 <p className="text-muted-foreground">
                   "Finalmente uma solução completa para gerir todos os meus links. O suporte é excelente!"
+                </p>
+              </div>
+              
+              <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
+                <div className="flex items-center mb-4">
+                  <img 
+                    src={testimonialWoman2} 
+                    alt="Ana Rodrigues" 
+                    className="w-12 h-12 rounded-full object-cover mr-3"
+                  />
+                  <div>
+                    <div className="font-semibold">Ana Rodrigues</div>
+                    <div className="text-sm text-muted-foreground">Empresária</div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground">
+                  "Desde que uso o RocketLink, as minhas conversões aumentaram 40%. Uma ferramenta indispensável!"
                 </p>
               </div>
             </div>

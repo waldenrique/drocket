@@ -418,13 +418,23 @@ const Index = () => {
           <p className="text-muted-foreground mb-8">
             Uma plataforma simples e poderosa para centralizar todos os seus links numa página personalizada.
           </p>
-          <Button 
-            onClick={() => navigate("/auth")} 
-            size="lg"
-            className="w-full"
-          >
-            Começar agora
-          </Button>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => navigate("/auth")} 
+              size="lg"
+              className="w-full"
+            >
+              Começar agora
+            </Button>
+            <Button 
+              onClick={() => navigate("/pricing")} 
+              variant="outline"
+              size="lg"
+              className="w-full"
+            >
+              Ver Planos e Preços
+            </Button>
+          </div>
         </div>
       </div>
     );

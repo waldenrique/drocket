@@ -412,7 +412,12 @@ const Index = () => {
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center">
               <Link2 className="h-6 w-6 text-primary mr-2" />
-              <h1 className="text-xl font-bold">RocketLink</h1>
+              <button 
+                onClick={() => navigate("/")}
+                className="text-xl font-bold hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                RocketLink
+              </button>
             </div>
             <div className="flex items-center gap-4">
               <Button 
@@ -669,7 +674,12 @@ const Index = () => {
           <div className="container mx-auto text-center">
             <div className="flex items-center justify-center mb-4">
               <Link2 className="h-6 w-6 text-primary mr-2" />
-              <span className="font-bold">RocketLink</span>
+              <button 
+                onClick={() => navigate("/")}
+                className="font-bold hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                RocketLink
+              </button>
             </div>
             <p className="text-sm text-muted-foreground">
               © 2024 RocketLink. Todos os direitos reservados.
@@ -684,10 +694,15 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <header className="border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <Link2 className="h-6 w-6 text-primary mr-2" />
-            <h1 className="text-lg sm:text-xl font-bold">RocketLink</h1>
-          </div>
+            <div className="flex items-center">
+              <Link2 className="h-6 w-6 text-primary mr-2" />
+              <button 
+                onClick={() => navigate("/")}
+                className="text-lg sm:text-xl font-bold hover:opacity-80 transition-opacity cursor-pointer"
+              >
+                RocketLink
+              </button>
+            </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button 
               variant="ghost" 

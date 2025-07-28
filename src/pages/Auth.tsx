@@ -209,9 +209,12 @@ const Auth = () => {
           <CardHeader className="text-center">
             <div className="flex items-center justify-center mb-4">
               <Link2 className="h-8 w-8 text-primary mr-2" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <button 
+                onClick={() => navigate("/")}
+                className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hover:opacity-80 transition-opacity cursor-pointer"
+              >
                 RocketLink
-              </h1>
+              </button>
             </div>
             <CardTitle>Bem-vindo</CardTitle>
             <CardDescription>

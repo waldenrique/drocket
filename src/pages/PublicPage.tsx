@@ -255,9 +255,12 @@ const PublicPage = () => {
           <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '600ms' }}>
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md 
                           rounded-full px-4 py-2 border border-white/20">
-              <span className="text-white/70 text-sm font-medium">
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="text-white/70 text-sm font-medium hover:text-white/90 transition-colors cursor-pointer"
+              >
                 Criado com RocketLink
-              </span>
+              </button>
             </div>
           </div>
         </div>

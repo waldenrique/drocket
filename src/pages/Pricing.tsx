@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Crown, Zap, BarChart3, Users, Shield } from "lucide-react";
+import { Check, Crown, Zap, BarChart3, Users, Shield, Link2, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,6 +11,7 @@ const Pricing = () => {
   const [loading, setLoading] = useState(false);
   const [subscription, setSubscription] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -116,6 +118,23 @@ const Pricing = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao fazer logout.",
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Logout realizado",
+        description: "Até à próxima!",
+      });
+      navigate("/auth");
+    }
+  };
+
   const features = {
     free: [
       "Até 2 links",
@@ -136,6 +155,51 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-primary/5">
+      {/* Header */}
+      <header className="border-b bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <Link2 className="h-6 w-6 text-primary mr-2" />
+            <button 
+              onClick={() => navigate("/")}
+              className="text-xl font-bold hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              RocketLink
+            </button>
+          </div>
+          {user && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground hidden sm:block">
+                Olá, {user.user_metadata?.display_name || user.email}
+              </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Sair</span>
+              </Button>
+            </div>
+          )}
+          {!user && (
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/auth")}
+              >
+                Entrar
+              </Button>
+              <Button 
+                onClick={() => navigate("/auth")}
+              >
+                Começar
+              </Button>
+            </div>
+          )}
+        </div>
+      </header>
+
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center max-w-3xl mx-auto mb-16">

@@ -104,12 +104,22 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    // Check for active subscriptions
-    const subscriptions = await stripe.subscriptions.list({
+    // Check for active and trialing subscriptions
+    const activeSubscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
       limit: 1,
     });
+    
+    const trialingSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "trialing", 
+      limit: 1,
+    });
+    
+    // Combine both active and trialing subscriptions
+    const allSubscriptions = [...activeSubscriptions.data, ...trialingSubscriptions.data];
+    const subscriptions = { data: allSubscriptions };
 
     let subscribed = false;
     let planName = "free";

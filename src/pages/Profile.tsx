@@ -208,7 +208,7 @@ export default function Profile() {
               <div className="flex gap-2 flex-wrap">
                 {isFree && (
                   <Button onClick={() => navigate("/pricing")} className="flex-1">
-                    Fazer Upgrade
+                    Fazer Upgrade para Premium
                   </Button>
                 )}
                 
@@ -216,14 +216,20 @@ export default function Profile() {
                   <>
                     <Button variant="outline" onClick={handleManageSubscription} className="flex-1">
                       <Settings className="h-4 w-4 mr-2" />
-                      Gerenciar
+                      Gerenciar Assinatura
                     </Button>
                     {!subscription?.cancel_at_period_end && (
                       <Button variant="destructive" onClick={handleCancelSubscription} className="flex-1">
-                        Cancelar
+                        Cancelar Assinatura
                       </Button>
                     )}
                   </>
+                )}
+                
+                {subscription?.cancel_at_period_end && (
+                  <div className="text-sm text-orange-600 bg-orange-50 p-2 rounded">
+                    Sua assinatura será cancelada em {formatDate(subscription.subscription_end)}
+                  </div>
                 )}
               </div>
             </CardContent>

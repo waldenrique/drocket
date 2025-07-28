@@ -7,6 +7,7 @@ interface SubscriptionData {
   in_trial: boolean;
   trial_end: string | null;
   subscription_end: string | null;
+  cancel_at_period_end?: boolean;
 }
 
 export const useSubscription = () => {

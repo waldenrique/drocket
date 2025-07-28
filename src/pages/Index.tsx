@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Session } from "@supabase/supabase-js";
-import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import PageCustomization from "@/components/PageCustomization";
 import ImageUpload from "@/components/ImageUpload";
+import TrialBanner from "@/components/TrialBanner";
 
 // Import testimonial images
 import testimonialWoman1 from "@/assets/testimonial-woman-1.jpg";
@@ -747,6 +748,15 @@ const Index = () => {
             >
               Planos
             </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/profile")}
+              className="text-primary hover:text-primary/80"
+            >
+              <UserIcon className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Perfil</span>
+            </Button>
             <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
               Olá, {user.user_metadata?.display_name || user.email}
             </span>
@@ -763,6 +773,8 @@ const Index = () => {
       </header>
       
       <main className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+        <TrialBanner />
+        
         <div className="text-center mb-6 sm:mb-8">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">Bem-vindo ao seu painel</h2>
           <p className="text-lg sm:text-xl text-muted-foreground">

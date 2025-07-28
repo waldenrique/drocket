@@ -111,15 +111,14 @@ export const ImageUpload = ({
         throw new Error('Usuário não autenticado');
       }
 
-      // Create file name
+      // Create file name (without nested folder)
       const fileExt = 'jpg';
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
 
-      // Upload to Supabase Storage
+      // Upload to Supabase Storage (path is just the filename since bucket is 'avatars')
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(filePath, resizedBlob, {
+        .upload(fileName, resizedBlob, {
           contentType: 'image/jpeg',
           upsert: true
         });
@@ -131,7 +130,7 @@ export const ImageUpload = ({
       // Get public URL
       const { data: urlData } = supabase.storage
         .from('avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
 
       if (!urlData?.publicUrl) {
         throw new Error('Falha ao obter URL da imagem');

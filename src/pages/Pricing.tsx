@@ -88,6 +88,34 @@ const Pricing = () => {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!confirm('Tem certeza que deseja cancelar sua assinatura? Ela será cancelada no final do período atual.')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cancel-subscription');
+      if (error) throw error;
+      
+      toast({
+        title: "Assinatura Cancelada",
+        description: "Sua assinatura será cancelada no final do período atual. Você ainda pode usar os recursos premium até lá.",
+      });
+      
+      // Refresh subscription status
+      await checkSubscription();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao cancelar assinatura",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const features = {
     free: [
       "Até 2 links",
@@ -135,7 +163,7 @@ const Pricing = () => {
                   <CardTitle className="text-lg">Seu Plano Atual</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="text-center">
+              <CardContent className="text-center space-y-3">
                 <div className="text-2xl font-bold text-primary mb-2">
                   {subscription.plan_name === 'premium' ? 'Premium' : 'Gratuito'}
                 </div>
@@ -144,16 +172,33 @@ const Pricing = () => {
                     Em período de teste
                   </Badge>
                 )}
-                {subscription.subscribed && (
-                  <Button 
-                    variant="outline" 
-                    onClick={handleManageSubscription}
-                    disabled={loading}
-                    className="w-full"
-                  >
-                    Gerenciar Assinatura
-                  </Button>
+                {subscription.cancel_at_period_end && (
+                  <Badge variant="destructive" className="mb-2">
+                    Cancelando no final do período
+                  </Badge>
                 )}
+                <div className="space-y-2">
+                  {subscription.subscribed && (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleManageSubscription}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      Gerenciar Assinatura
+                    </Button>
+                  )}
+                  {subscription.subscribed && !subscription.cancel_at_period_end && (
+                    <Button 
+                      variant="destructive" 
+                      onClick={handleCancelSubscription}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      Cancelar Assinatura
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

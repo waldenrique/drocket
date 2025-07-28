@@ -244,6 +244,14 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      check_link_limit_enhanced: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
+      log_security_event: {
+        Args: { event_type: string; user_uuid?: string; metadata?: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

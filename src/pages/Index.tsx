@@ -668,7 +668,7 @@ const Index = () => {
               <div className="bg-background/50 p-6 rounded-2xl border hover-scale">
                 <div className="flex items-center mb-4">
                   <img 
-                    src={testimonialMan2} 
+                    src={testimonialMan1} 
                     alt="Pedro Santos" 
                     className="w-12 h-12 rounded-full object-cover mr-3"
                   />

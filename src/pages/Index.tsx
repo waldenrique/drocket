@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { User, Session } from "@supabase/supabase-js";
-import { Link2, LogOut, Plus, Edit, Eye } from "lucide-react";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 
@@ -17,6 +17,22 @@ interface PageFormData {
   description?: string;
 }
 
+interface LinkFormData {
+  title: string;
+  url: string;
+  icon?: string;
+}
+
+interface Link {
+  id: string;
+  title: string;
+  url: string;
+  icon?: string;
+  position: number;
+  is_active: boolean;
+  click_count: number;
+}
+
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -24,10 +40,15 @@ const Index = () => {
   const [page, setPage] = useState<any>(null);
   const [pageLoading, setPageLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [links, setLinks] = useState<Link[]>([]);
+  const [linksLoading, setLinksLoading] = useState(false);
+  const [showLinkForm, setShowLinkForm] = useState(false);
+  const [editingLink, setEditingLink] = useState<Link | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   
   const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm<PageFormData>();
+  const { register: registerLink, handleSubmit: handleSubmitLink, formState: { errors: linkErrors }, setValue: setLinkValue, reset: resetLink } = useForm<LinkFormData>();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -77,17 +98,178 @@ const Index = () => {
       
       setPage(data);
       
-      // Se existe página, preencher o formulário
+      // Se existe página, preencher o formulário e carregar links
       if (data) {
         setValue('title', data.title);
         setValue('slug', data.slug);
         setValue('description', data.description || '');
+        
+        // Carregar links da página
+        loadPageLinks(data.id);
       }
     } catch (error) {
       console.error('Erro ao carregar página:', error);
     } finally {
       setPageLoading(false);
     }
+  };
+
+  const loadPageLinks = async (pageId: string) => {
+    setLinksLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('links')
+        .select('*')
+        .eq('page_id', pageId)
+        .order('position');
+      
+      if (error) {
+        console.error('Erro ao carregar links:', error);
+        return;
+      }
+      
+      setLinks(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar links:', error);
+    } finally {
+      setLinksLoading(false);
+    }
+  };
+
+  const onSubmitLink = async (data: LinkFormData) => {
+    if (!page) return;
+    
+    setLinksLoading(true);
+    try {
+      let url = data.url;
+      
+      // Add https:// if no protocol is provided
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+      
+      const linkData = {
+        title: data.title,
+        url: url,
+        icon: data.icon || '',
+        page_id: page.id,
+        position: editingLink ? editingLink.position : links.length,
+        is_active: true
+      };
+      
+      if (editingLink) {
+        // Atualizar link existente
+        const { error } = await supabase
+          .from('links')
+          .update(linkData)
+          .eq('id', editingLink.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Link atualizado com sucesso!",
+        });
+      } else {
+        // Criar novo link
+        const { error } = await supabase
+          .from('links')
+          .insert(linkData);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Sucesso",
+          description: "Link criado com sucesso!",
+        });
+      }
+      
+      setShowLinkForm(false);
+      setEditingLink(null);
+      resetLink();
+      // Recarregar links
+      await loadPageLinks(page.id);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao salvar link.",
+        variant: "destructive"
+      });
+    } finally {
+      setLinksLoading(false);
+    }
+  };
+
+  const handleEditLink = (link: Link) => {
+    setEditingLink(link);
+    setLinkValue('title', link.title);
+    setLinkValue('url', link.url);
+    setLinkValue('icon', link.icon || '');
+    setShowLinkForm(true);
+  };
+
+  const handleDeleteLink = async (linkId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este link?')) return;
+    
+    setLinksLoading(true);
+    try {
+      const { error } = await supabase
+        .from('links')
+        .delete()
+        .eq('id', linkId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: "Link excluído com sucesso!",
+      });
+      
+      // Recarregar links
+      if (page) await loadPageLinks(page.id);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao excluir link.",
+        variant: "destructive"
+      });
+    } finally {
+      setLinksLoading(false);
+    }
+  };
+
+  const handleToggleLink = async (linkId: string, isActive: boolean) => {
+    setLinksLoading(true);
+    try {
+      const { error } = await supabase
+        .from('links')
+        .update({ is_active: !isActive })
+        .eq('id', linkId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Sucesso",
+        description: `Link ${!isActive ? 'ativado' : 'desativado'} com sucesso!`,
+      });
+      
+      // Recarregar links
+      if (page) await loadPageLinks(page.id);
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao alterar estado do link.",
+        variant: "destructive"
+      });
+    } finally {
+      setLinksLoading(false);
+    }
+  };
+
+  const handleCancelLinkEdit = () => {
+    setShowLinkForm(false);
+    setEditingLink(null);
+    resetLink();
   };
 
   const onSubmit = async (data: PageFormData) => {
@@ -414,6 +596,197 @@ const Index = () => {
                         variant="outline"
                         onClick={handleCancelEdit}
                         disabled={pageLoading}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Seção de Links - só aparece se tem página e não está editando página */}
+            {page && !showForm && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Links da página</span>
+                    <Button
+                      size="sm"
+                      onClick={() => setShowLinkForm(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Adicionar link
+                    </Button>
+                  </CardTitle>
+                  <CardDescription>
+                    Gerencie os links que aparecerão na sua página
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {linksLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {links.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Link2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-medium mb-2">Nenhum link adicionado</h3>
+                          <p className="text-muted-foreground mb-4">
+                            Adicione o seu primeiro link para começar a construir a sua página.
+                          </p>
+                          <Button onClick={() => setShowLinkForm(true)}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Adicionar primeiro link
+                          </Button>
+                        </div>
+                      ) : (
+                        links.map((link, index) => (
+                          <div
+                            key={link.id}
+                            className={`flex items-center gap-4 p-4 rounded-lg border ${
+                              link.is_active ? 'bg-background' : 'bg-muted/50'
+                            }`}
+                          >
+                            <div className="flex items-center text-muted-foreground">
+                              <GripVertical className="h-4 w-4" />
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <h4 className={`font-medium truncate ${!link.is_active ? 'text-muted-foreground' : ''}`}>
+                                  {link.title}
+                                </h4>
+                                {!link.is_active && (
+                                  <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
+                                    Inativo
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground truncate">{link.url}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {link.click_count} cliques
+                              </p>
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(link.url, '_blank')}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleToggleLink(link.id, link.is_active)}
+                                disabled={linksLoading}
+                              >
+                                {link.is_active ? (
+                                  <ToggleRight className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <ToggleLeft className="h-4 w-4 text-muted-foreground" />
+                                )}
+                              </Button>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEditLink(link)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteLink(link.id)}
+                                disabled={linksLoading}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Formulário de criação/edição de link */}
+            {showLinkForm && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{editingLink ? 'Editar link' : 'Adicionar novo link'}</CardTitle>
+                  <CardDescription>
+                    {editingLink ? 'Atualize os detalhes do link' : 'Adicione um novo link à sua página'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmitLink(onSubmitLink)} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="linkTitle">Título do link *</Label>
+                      <Input
+                        id="linkTitle"
+                        placeholder="Ex: Meu Instagram, Meu Website, etc."
+                        {...registerLink('title', { 
+                          required: 'Título é obrigatório',
+                          minLength: { value: 2, message: 'Título deve ter pelo menos 2 caracteres' }
+                        })}
+                      />
+                      {linkErrors.title && (
+                        <p className="text-sm text-red-500">{linkErrors.title.message}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="linkUrl">URL *</Label>
+                      <Input
+                        id="linkUrl"
+                        placeholder="Ex: instagram.com/usuario, meusite.com, etc."
+                        {...registerLink('url', { 
+                          required: 'URL é obrigatória',
+                          pattern: {
+                            value: /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+                            message: 'URL inválida'
+                          }
+                        })}
+                      />
+                      {linkErrors.url && (
+                        <p className="text-sm text-red-500">{linkErrors.url.message}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Pode incluir ou omitir https:// - será adicionado automaticamente se necessário
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="linkIcon">Ícone (opcional)</Label>
+                      <Input
+                        id="linkIcon"
+                        placeholder="Ex: 📱, 🌐, 💼, etc."
+                        {...registerLink('icon')}
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Adicione um emoji que represente o link (opcional)
+                      </p>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button type="submit" disabled={linksLoading}>
+                        {linksLoading ? 'A guardar...' : (editingLink ? 'Atualizar link' : 'Adicionar link')}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCancelLinkEdit}
+                        disabled={linksLoading}
                       >
                         Cancelar
                       </Button>

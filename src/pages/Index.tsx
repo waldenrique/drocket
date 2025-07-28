@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp } from "lucide-react";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -815,32 +815,24 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 max-w-7xl">
         <TrialBanner />
         
-        {/* Hero Dashboard Section */}
-        <div className="mb-12">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-              {isPremium ? (
-                <>
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  Premium Ativo
-                </>
-              ) : (
-                <>
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  Plano Gratuito
-                </>
-              )}
+        {/* Hero Section - Premium Dashboard */}
+        {isPremium && (
+          <div className="mb-12">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                Premium Ativo
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                Seu Dashboard RocketLink
+              </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+                Gerencie seus links, acompanhe o desempenho e construa sua presença digital profissional
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Seu Dashboard RocketLink
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Gerencie seus links, acompanhe o desempenho e construa sua presença digital profissional
-            </p>
-          </div>
 
-          {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Quick Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/20">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -906,6 +898,43 @@ const Index = () => {
             </Card>
           </div>
         </div>
+        )}
+
+        {/* Hero Section - Free Users */}
+        {!isPremium && (
+          <div className="mb-12">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 bg-muted text-muted-foreground px-4 py-2 rounded-full text-sm font-medium mb-4">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Plano Gratuito
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                Gerencie Seus Links
+              </h1>
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                Crie e compartilhe seus links importantes
+              </p>
+              
+              {/* Upgrade Call-to-Action */}
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/20 max-w-2xl mx-auto">
+                <div className="flex items-center justify-center mb-4">
+                  <Crown className="h-8 w-8 text-primary mr-2" />
+                  <h3 className="text-xl font-semibold text-primary">Desbloqueie o Dashboard Completo</h3>
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Acesse estatísticas avançadas, links ilimitados e muito mais!
+                </p>
+                <Button 
+                  onClick={() => navigate('/pricing')}
+                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white px-6 py-3 rounded-xl font-semibold"
+                >
+                  <Crown className="mr-2 h-4 w-4" />
+                  Fazer Upgrade
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {pageLoading ? (
           <div className="flex items-center justify-center py-12">

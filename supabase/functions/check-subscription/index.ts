@@ -148,8 +148,8 @@ serve(async (req) => {
       });
     }
 
-    // Update database
-    await supabaseClient.from("subscriptions").upsert({
+    // Update database with proper upsert
+    const { error: upsertError } = await supabaseClient.from("subscriptions").upsert({
       user_id: user.id,
       plan_name: planName,
       plan_type: planName,
@@ -158,8 +158,14 @@ serve(async (req) => {
       stripe_subscription_id: subscriptions.data[0]?.id || null,
       trial_end: trialEnd,
       current_period_end: subscriptionEnd,
+      cancel_at_period_end: false, // Reset this field when updating
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
+
+    if (upsertError) {
+      logStep("Database upsert error", { error: upsertError });
+      throw new Error(`Database update failed: ${upsertError.message}`);
+    }
 
     logStep("Database updated", { subscribed, planName, inTrial });
 

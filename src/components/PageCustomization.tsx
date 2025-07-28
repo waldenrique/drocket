@@ -151,17 +151,17 @@ const PageCustomization = ({ page, onUpdate }: CustomizationProps) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="colors" className="w-full">
+        <Tabs defaultValue="gradients" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="colors">Cores</TabsTrigger>
             <TabsTrigger value="gradients">Gradientes</TabsTrigger>
             <TabsTrigger value="image">Imagem</TabsTrigger>
+            <TabsTrigger value="colors">Cores</TabsTrigger>
           </TabsList>
           
           <TabsContent value="colors" className="space-y-4">
             <div>
               <Label className="text-sm font-medium mb-3 block">Cores predefinidas</Label>
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+              <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
                 {predefinedColors.map((color) => (
                   <button
                     key={color.value}

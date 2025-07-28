@@ -92,19 +92,47 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    // Find active subscriptions
+    // Find subscriptions (active, trialing, or past_due)
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
-      limit: 1,
+      status: "all",
+      limit: 10,
     });
 
-    if (subscriptions.data.length === 0) {
-      throw new Error("No active subscription found");
+    // Filter for cancellable subscriptions
+    const cancellableSubscriptions = subscriptions.data.filter(sub => 
+      ['active', 'trialing', 'past_due'].includes(sub.status) && !sub.cancel_at_period_end
+    );
+
+    logStep("Found subscriptions", { 
+      total: subscriptions.data.length, 
+      cancellable: cancellableSubscriptions.length,
+      statuses: subscriptions.data.map(s => ({ id: s.id, status: s.status, cancel_at_period_end: s.cancel_at_period_end }))
+    });
+
+    if (cancellableSubscriptions.length === 0) {
+      // Check if there are any subscriptions that are already cancelled
+      const alreadyCancelled = subscriptions.data.filter(sub => sub.cancel_at_period_end);
+      if (alreadyCancelled.length > 0) {
+        return new Response(JSON.stringify({ 
+          error: "Sua assinatura já está programada para cancelamento no final do período atual.",
+          cancelAt: new Date(alreadyCancelled[0].current_period_end * 1000)
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+      
+      return new Response(JSON.stringify({ 
+        error: "Nenhuma assinatura ativa encontrada para cancelar." 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
-    const subscription = subscriptions.data[0];
-    logStep("Found active subscription", { subscriptionId: subscription.id });
+    const subscription = cancellableSubscriptions[0];
+    logStep("Found cancellable subscription", { subscriptionId: subscription.id, status: subscription.status });
 
     // Cancel the subscription at period end
     const cancelledSubscription = await stripe.subscriptions.update(subscription.id, {

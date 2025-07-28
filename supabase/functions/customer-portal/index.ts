@@ -36,7 +36,10 @@ const sanitizeError = (error: any): string => {
   // Don't expose internal errors
   const safeErrors = [
     "User not authenticated",
-    "No Stripe customer found for this user"
+    "No Stripe customer found for this user",
+    "configuration",
+    "Você precisa ter uma assinatura",
+    "portal do cliente não está configurado"
   ];
   
   const errorMessage = error instanceof Error ? error.message : String(error);
@@ -83,24 +86,62 @@ serve(async (req) => {
     
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     if (customers.data.length === 0) {
-      throw new Error("No Stripe customer found for this user");
+      // Create customer if doesn't exist but no subscription means they can't access portal
+      return new Response(JSON.stringify({ 
+        error: "Você precisa ter uma assinatura ativa para acessar o portal de gerenciamento. Por favor, assine um plano primeiro." 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
     
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
-    const portalSession = await stripe.billingPortal.sessions.create({
+    // Check if customer has any subscriptions
+    const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      return_url: `${origin}/pricing`,
+      limit: 1
     });
-    
-    logStep("Customer portal session created", { sessionId: portalSession.id });
 
-    return new Response(JSON.stringify({ url: portalSession.url }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+    if (subscriptions.data.length === 0) {
+      return new Response(JSON.stringify({ 
+        error: "Você precisa ter uma assinatura para acessar o portal de gerenciamento. Por favor, assine um plano primeiro." 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    const origin = req.headers.get("origin") || "http://localhost:3000";
+    
+    try {
+      const portalSession = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${origin}/pricing`,
+      });
+      
+      logStep("Customer portal session created", { sessionId: portalSession.id });
+
+      return new Response(JSON.stringify({ url: portalSession.url }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    } catch (stripeError: any) {
+      logStep("Stripe portal error", { error: stripeError.message });
+      
+      if (stripeError.message.includes("configuration")) {
+        return new Response(JSON.stringify({ 
+          error: "O portal do cliente não está configurado. Configure-o no Stripe Dashboard em Settings > Billing > Customer Portal." 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        });
+      }
+      
+      throw stripeError;
+    }
+
   } catch (error) {
     const sanitizedError = sanitizeError(error);
     logStep("ERROR in customer-portal", { 

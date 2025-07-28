@@ -1,25 +1,25 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useForm } from "react-hook-form";
+import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3, MousePointer, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { User, Session } from "@supabase/supabase-js";
-import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight, User as UserIcon, BarChart3 } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import PageCustomization from "@/components/PageCustomization";
 import ImageUpload from "@/components/ImageUpload";
 import TrialBanner from "@/components/TrialBanner";
-import { useSubscription } from "@/hooks/useSubscription";
 
 // Import testimonial images
-import testimonialWoman1 from "@/assets/testimonial-woman-1.jpg";
-import testimonialMan1 from "@/assets/testimonial-man-1.jpg";
-import testimonialMan2 from "@/assets/testimonial-man-2.jpg";
+import { useSubscription } from "@/hooks/useSubscription";
 import testimonialWoman2 from "@/assets/testimonial-woman-2.jpg";
+import testimonialMan1 from "@/assets/testimonial-man-1.jpg";
+import testimonialWoman1 from "@/assets/testimonial-woman-1.jpg";
 
 interface PageFormData {
   title: string;
@@ -747,24 +747,27 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
-      <header className="border-b bg-background/80 backdrop-blur-sm">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/[0.02] to-primary/[0.05]">
+      <header className="border-b bg-background/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <Link2 className="h-6 w-6 text-primary mr-2" />
+          <div className="flex items-center">
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-primary/10">
+              <Link2 className="h-6 w-6 text-primary" />
               <button 
                 onClick={() => navigate("/")}
-                className="text-lg sm:text-xl font-bold hover:opacity-80 transition-opacity cursor-pointer"
+                className="text-lg sm:text-xl font-bold text-primary hover:opacity-80 transition-opacity cursor-pointer"
               >
                 RocketLink
               </button>
             </div>
+          </div>
+          
           <div className="flex items-center gap-2 sm:gap-4">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/pricing")}
-              className="text-primary hover:text-primary/80"
+              className="text-primary hover:text-primary/80 font-medium"
             >
               Planos
             </Button>
@@ -773,7 +776,7 @@ const Index = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => navigate("/analytics")}
-                className="text-primary hover:text-primary/80"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 <BarChart3 className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Analytics</span>
@@ -783,7 +786,7 @@ const Index = () => {
               variant="ghost" 
               size="sm" 
               onClick={() => navigate("/profile")}
-              className="text-primary hover:text-primary/80"
+              className="text-primary hover:text-primary/80 font-medium"
             >
               <UserIcon className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Perfil</span>
@@ -800,6 +803,7 @@ const Index = () => {
               variant="outline" 
               size="sm" 
               onClick={handleSignOut}
+              className="shadow-sm"
             >
               <LogOut className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Sair</span>
@@ -808,184 +812,316 @@ const Index = () => {
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         <TrialBanner />
         
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4">Bem-vindo ao seu painel</h2>
-          <p className="text-lg sm:text-xl text-muted-foreground">
-            Gerir a sua página de links
-          </p>
+        {/* Hero Dashboard Section */}
+        <div className="mb-12">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
+              {isPremium ? (
+                <>
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Premium Ativo
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Plano Gratuito
+                </>
+              )}
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Seu Dashboard RocketLink
+            </h1>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Gerencie seus links, acompanhe o desempenho e construa sua presença digital profissional
+            </p>
+          </div>
+
+          {/* Quick Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Links Ativos</p>
+                    <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                      {links.filter(l => l.is_active).length}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-blue-500/20 rounded-full">
+                    <Link2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/20 dark:to-green-900/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400">Total de Cliques</p>
+                    <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                      {links.reduce((sum, link) => sum + (link.click_count || 0), 0)}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-green-500/20 rounded-full">
+                    <MousePointer className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/20 dark:to-purple-900/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Status da Página</p>
+                    <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                      {page?.is_active ? 'Ativa' : 'Inativa'}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-purple-500/20 rounded-full">
+                    <Eye className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/20 dark:to-orange-900/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-orange-600 dark:text-orange-400">Plano Atual</p>
+                    <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">
+                      {isPremium ? 'Premium' : 'Gratuito'}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-orange-500/20 rounded-full">
+                    <UserIcon className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {pageLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Carregando seu dashboard...</p>
+            </div>
           </div>
         ) : (
-          <div className="grid gap-4 sm:gap-6">
-            {/* Estado da página */}
+          <div className="grid gap-8">
+            {/* Seção da Página Principal */}
             {!showForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <span className="text-lg sm:text-xl">A sua página RocketLink</span>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      {page && (
+              <div className="space-y-8">
+                {/* Card da Página */}
+                <Card className="border-0 shadow-xl bg-gradient-to-r from-background to-background/95 overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-y-8 translate-x-8"></div>
+                  <CardHeader className="relative">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                      <div className="space-y-2">
+                        <CardTitle className="text-2xl lg:text-3xl font-bold">
+                          {page ? 'Sua Página RocketLink' : 'Criar Sua Primeira Página'}
+                        </CardTitle>
+                        <CardDescription className="text-base">
+                          {page ? 
+                            'Sua página está configurada e pronta para receber visitantes' : 
+                            'Configure sua página personalizada para começar a compartilhar seus links'
+                          }
+                        </CardDescription>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+                        {page && (
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={() => window.open(`/${page.slug}`, '_blank')}
+                            className="shadow-md hover:shadow-lg transition-shadow"
+                          >
+                            <Eye className="h-5 w-5 mr-2" />
+                            Ver Página ao Vivo
+                          </Button>
+                        )}
                         <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => window.open(`/${page.slug}`, '_blank')}
-                          className="w-full sm:w-auto"
+                          size="lg"
+                          onClick={handleEditClick}
+                          className="shadow-md hover:shadow-lg transition-shadow bg-gradient-to-r from-primary to-primary/90"
                         >
-                          <Eye className="h-4 w-4 mr-2" />
-                          Ver página
+                          <Edit className="h-5 w-5 mr-2" />
+                          {page ? 'Editar Página' : 'Criar Página'}
                         </Button>
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleEditClick}
-                        className="w-full sm:w-auto"
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        {page ? 'Editar' : 'Criar'}
-                      </Button>
+                      </div>
                     </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {page ? (
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-sm font-medium">Título</Label>
-                        <p className="text-lg">{page.title}</p>
-                      </div>
-                      <div>
-                        <Label className="text-sm font-medium">URL</Label>
-                        <p className="text-muted-foreground">rocketlink.com/{page.slug}</p>
-                      </div>
-                      {page.description && (
-                        <div>
-                          <Label className="text-sm font-medium">Descrição</Label>
-                          <p className="text-muted-foreground">{page.description}</p>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    {page ? (
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="p-4 bg-muted/30 rounded-lg">
+                            <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Título</Label>
+                            <p className="text-xl font-medium mt-1">{page.title}</p>
+                          </div>
+                          <div className="p-4 bg-muted/30 rounded-lg">
+                            <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">URL</Label>
+                            <p className="text-lg text-primary mt-1 font-mono">rocketlink.com/{page.slug}</p>
+                          </div>
                         </div>
-                      )}
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className={`inline-block w-2 h-2 rounded-full ${page.is_active ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                        {page.is_active ? 'Página ativa' : 'Página inativa'}
+                        <div className="space-y-4">
+                          {page.description && (
+                            <div className="p-4 bg-muted/30 rounded-lg">
+                              <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Descrição</Label>
+                              <p className="text-muted-foreground mt-1">{page.description}</p>
+                            </div>
+                          )}
+                          <div className="p-4 bg-muted/30 rounded-lg">
+                            <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Status</Label>
+                            <div className="flex items-center gap-3 mt-2">
+                              <div className={`w-3 h-3 rounded-full ${page.is_active ? 'bg-green-500' : 'bg-red-500'} shadow-lg`}></div>
+                              <span className="font-medium">
+                                {page.is_active ? 'Página Ativa e Visível' : 'Página Inativa'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Plus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-medium mb-2">Ainda não tem uma página</h3>
-                      <p className="text-muted-foreground mb-4">
-                        Crie a sua primeira página RocketLink para começar a partilhar os seus links.
-                      </p>
-                      <Button onClick={handleEditClick}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Criar página
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                    ) : (
+                      <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <Plus className="h-10 w-10 text-primary" />
+                        </div>
+                        <h3 className="text-2xl font-bold mb-4">Pronto para começar?</h3>
+                        <p className="text-muted-foreground text-lg mb-8 max-w-md mx-auto">
+                          Crie sua primeira página RocketLink e comece a compartilhar seus links de forma profissional
+                        </p>
+                        <Button size="lg" onClick={handleEditClick} className="shadow-lg">
+                          <Plus className="h-5 w-5 mr-2" />
+                          Criar Minha Primeira Página
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
             )}
 
-            {/* Formulário de criação/edição */}
+            {/* Formulário de criação/edição com design moderno */}
             {showForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{page ? 'Editar página' : 'Criar nova página'}</CardTitle>
-                  <CardDescription>
-                    {page ? 'Atualize os detalhes da sua página' : 'Configure a sua página RocketLink'}
+              <Card className="border-0 shadow-2xl bg-gradient-to-br from-background to-background/80 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5"></div>
+                <CardHeader className="relative bg-gradient-to-r from-primary/10 to-transparent">
+                  <CardTitle className="text-3xl font-bold">
+                    {page ? 'Personalizar Sua Página' : 'Criar Nova Página RocketLink'}
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    {page ? 'Atualize os detalhes e personalize sua página' : 'Configure sua presença digital profissional'}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Título da página *</Label>
-                      <Input
-                        id="title"
-                        placeholder="Ex: João Silva - Links"
-                        {...register('title', { 
-                          required: 'Título é obrigatório',
-                          minLength: { value: 2, message: 'Título deve ter pelo menos 2 caracteres' }
-                        })}
-                      />
-                      {errors.title && (
-                        <p className="text-sm text-red-500">{errors.title.message}</p>
-                      )}
-                    </div>
+                <CardContent className="relative p-8">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="title" className="text-base font-semibold">Título da página *</Label>
+                          <Input
+                            id="title"
+                            placeholder="Ex: João Silva - Links"
+                            className="h-12 text-lg border-2 focus:border-primary transition-colors"
+                            {...register('title', { 
+                              required: 'Título é obrigatório',
+                              minLength: { value: 2, message: 'Título deve ter pelo menos 2 caracteres' }
+                            })}
+                          />
+                          {errors.title && (
+                            <p className="text-sm text-red-500 font-medium">{errors.title.message}</p>
+                          )}
+                        </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="slug">URL personalizada *</Label>
-                      <div className="flex">
-                        <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                          rocketlink.com/
-                        </span>
-                        <Input
-                          id="slug"
-                          placeholder="joao-silva"
-                          className="rounded-l-none"
-                          {...register('slug', { 
-                            required: 'Slug é obrigatório',
-                            pattern: {
-                              value: /^[a-z0-9-]+$/,
-                              message: 'Use apenas letras minúsculas, números e hífens'
-                            },
-                            minLength: { value: 3, message: 'Slug deve ter pelo menos 3 caracteres' }
-                          })}
-                        />
+                        <div className="space-y-3">
+                          <Label htmlFor="slug" className="text-base font-semibold">URL personalizada *</Label>
+                          <div className="flex">
+                            <span className="inline-flex items-center px-4 rounded-l-lg border-2 border-r-0 border-input bg-muted text-muted-foreground text-sm font-medium">
+                              rocketlink.com/
+                            </span>
+                            <Input
+                              id="slug"
+                              placeholder="joao-silva"
+                              className="rounded-l-none h-12 text-lg border-2 border-l-0 focus:border-primary transition-colors"
+                              {...register('slug', { 
+                                required: 'Slug é obrigatório',
+                                pattern: {
+                                  value: /^[a-z0-9-]+$/,
+                                  message: 'Use apenas letras minúsculas, números e hífens'
+                                },
+                                minLength: { value: 3, message: 'Slug deve ter pelo menos 3 caracteres' }
+                              })}
+                            />
+                          </div>
+                          {errors.slug && (
+                            <p className="text-sm text-red-500 font-medium">{errors.slug.message}</p>
+                          )}
+                          <p className="text-sm text-muted-foreground">
+                            Use apenas letras minúsculas, números e hífens. Ex: joao-silva
+                          </p>
+                        </div>
                       </div>
-                      {errors.slug && (
-                        <p className="text-sm text-red-500">{errors.slug.message}</p>
-                      )}
-                      <p className="text-sm text-muted-foreground">
-                        Use apenas letras minúsculas, números e hífens. Ex: joao-silva
-                      </p>
+
+                      <div className="space-y-6">
+                        <div className="space-y-3">
+                          <Label htmlFor="description" className="text-base font-semibold">Descrição</Label>
+                          <Textarea
+                            id="description"
+                            placeholder="Descreva brevemente o que os visitantes encontrarão na sua página..."
+                            rows={5}
+                            className="text-lg border-2 focus:border-primary transition-colors resize-none"
+                            {...register('description')}
+                          />
+                          <p className="text-sm text-muted-foreground">
+                            Opcional: ajude os visitantes a entender do que se trata a sua página
+                          </p>
+                        </div>
+
+                        {/* Upload de foto de perfil */}
+                        <div className="space-y-3">
+                          <ImageUpload
+                            currentImageUrl={profile?.avatar_url}
+                            onImageUploaded={(url) => {
+                              setProfile(prev => ({ ...prev, avatar_url: url }));
+                              toast({
+                                title: "Sucesso!",
+                                description: "Foto atualizada! Ela aparecerá na sua página pública.",
+                              });
+                            }}
+                            onImageRemoved={() => {
+                              setProfile(prev => ({ ...prev, avatar_url: null }));
+                            }}
+                            label="Foto de perfil / Logo"
+                            placeholder="Adicione uma foto que representará você na página pública"
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Descrição</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Descreva brevemente o que os visitantes encontrarão na sua página..."
-                        rows={3}
-                        {...register('description')}
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        Opcional: ajude os visitantes a entender do que se trata a sua página
-                      </p>
-                     </div>
-
-                     {/* Upload de foto de perfil */}
-                     <ImageUpload
-                       currentImageUrl={profile?.avatar_url}
-                       onImageUploaded={(url) => {
-                         setProfile(prev => ({ ...prev, avatar_url: url }));
-                         toast({
-                           title: "Sucesso!",
-                           description: "Foto atualizada! Ela aparecerá na sua página pública.",
-                         });
-                       }}
-                       onImageRemoved={() => {
-                         setProfile(prev => ({ ...prev, avatar_url: null }));
-                       }}
-                       label="Foto de perfil / Logo"
-                       placeholder="Adicione uma foto que representará você na página pública"
-                     />
-
-                    <div className="flex gap-3 pt-4">
-                      <Button type="submit" disabled={pageLoading}>
-                        {pageLoading ? 'A guardar...' : (page ? 'Atualizar' : 'Criar página')}
+                    <div className="flex gap-4 pt-8 border-t">
+                      <Button 
+                        type="submit" 
+                        disabled={pageLoading}
+                        size="lg"
+                        className="px-8 bg-gradient-to-r from-primary to-primary/90 shadow-lg"
+                      >
+                        {pageLoading ? 'Salvando...' : (page ? 'Atualizar Página' : 'Criar Página')}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
+                        size="lg"
                         onClick={handleCancelEdit}
                         disabled={pageLoading}
+                        className="px-8"
                       >
                         Cancelar
                       </Button>
@@ -995,37 +1131,66 @@ const Index = () => {
               </Card>
             )}
 
-            {/* Seção de Links - só aparece se tem página e não está editando página */}
+            {/* Seção de Links - Design Moderno */}
             {page && !showForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex flex-col gap-1">
-                      <span>Links da página</span>
-                      <div className="text-sm font-normal text-muted-foreground">
-                        {links.length}/2 links utilizados (Plano Gratuito)
+              <Card className="border-0 shadow-xl bg-gradient-to-r from-background to-background/95 overflow-hidden">
+                <div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-primary/10 to-transparent rounded-full -translate-y-12 -translate-x-12"></div>
+                <CardHeader className="relative">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                      <CardTitle className="text-2xl lg:text-3xl font-bold">Gerenciar Links</CardTitle>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 bg-primary rounded-full"></div>
+                          <span className="text-lg font-medium">
+                            {links.length}/{isPremium ? '∞' : '2'} links utilizados
+                          </span>
+                        </div>
+                        {!isPremium && (
+                          <Badge variant="outline" className="text-sm">
+                            Plano Gratuito
+                          </Badge>
+                        )}
+                        {isPremium && (
+                          <Badge className="text-sm bg-gradient-to-r from-primary to-primary/80">
+                            Premium - Links Ilimitados
+                          </Badge>
+                        )}
                       </div>
                     </div>
                     <Button
-                      size="sm"
+                      size="lg"
                       onClick={() => setShowLinkForm(true)}
-                      disabled={links.length >= 2}
+                      disabled={!isPremium && links.length >= 2}
+                      className="shadow-lg bg-gradient-to-r from-primary to-primary/90"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Adicionar link
+                      <Plus className="h-5 w-5 mr-2" />
+                      Adicionar Link
                     </Button>
-                  </CardTitle>
-                  <CardDescription>
-                    Gerencie os links que aparecerão na sua página
-                    {links.length >= 2 && (
-                      <div className="mt-2 p-2 bg-orange-50 text-orange-800 rounded text-sm">
-                        Limite atingido! Faça upgrade para Premium para links ilimitados.
-                        <Button variant="link" size="sm" onClick={() => navigate('/pricing')} className="p-0 h-auto text-orange-600 underline ml-1">
-                          Ver planos
+                  </div>
+                  {!isPremium && links.length >= 2 && (
+                    <div className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-950/20 dark:to-yellow-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <TrendingUp className="h-5 w-5 text-orange-600" />
+                        <div>
+                          <p className="font-medium text-orange-800 dark:text-orange-200">
+                            Limite de links atingido!
+                          </p>
+                          <p className="text-sm text-orange-700 dark:text-orange-300">
+                            Faça upgrade para Premium e tenha links ilimitados, analytics avançados e muito mais.
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate('/pricing')}
+                          className="ml-auto bg-gradient-to-r from-orange-500 to-yellow-500 text-white border-0 hover:from-orange-600 hover:to-yellow-600"
+                        >
+                          Ver Planos Premium
                         </Button>
                       </div>
-                    )}
-                  </CardDescription>
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
                   {linksLoading ? (

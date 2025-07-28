@@ -129,6 +129,8 @@ const PublicPage = () => {
 
   const backgroundStyle = page.background_type === 'color' 
     ? { backgroundColor: page.background_value }
+    : page.background_type === 'gradient'
+    ? { background: page.background_value }
     : { backgroundImage: `url(${page.background_value})`, backgroundSize: 'cover', backgroundPosition: 'center' };
 
   return (

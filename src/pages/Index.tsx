@@ -10,6 +10,7 @@ import { User, Session } from "@supabase/supabase-js";
 import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, ToggleLeft, ToggleRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
+import PageCustomization from "@/components/PageCustomization";
 
 interface PageFormData {
   title: string;
@@ -794,6 +795,14 @@ const Index = () => {
                   </form>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Personalização da página */}
+            {page && !showForm && (
+              <PageCustomization 
+                page={page} 
+                onUpdate={() => loadUserPage(user?.id || '')}
+              />
             )}
           </div>
         )}

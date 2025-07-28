@@ -63,6 +63,7 @@ export const useSubscription = () => {
   const isPremium = subscription?.subscribed || false;
   const isFree = !isPremium;
   const isInTrial = subscription?.in_trial || false;
+  const isCancelled = subscription?.cancel_at_period_end || false;
 
   return {
     subscription,
@@ -71,6 +72,7 @@ export const useSubscription = () => {
     isPremium,
     isFree,
     isInTrial,
+    isCancelled,
     refreshSubscription
   };
 };

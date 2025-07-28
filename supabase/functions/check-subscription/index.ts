@@ -126,6 +126,7 @@ serve(async (req) => {
     let inTrial = false;
     let trialEnd = null;
     let subscriptionEnd = null;
+    let cancelAtPeriodEnd = false;
 
     if (subscriptions.data.length > 0) {
       const subscription = subscriptions.data[0];
@@ -139,12 +140,14 @@ serve(async (req) => {
       }
       
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      cancelAtPeriodEnd = subscription.cancel_at_period_end || false;
       
       logStep("Active subscription found", { 
         subscriptionId: subscription.id, 
         inTrial,
         trialEnd,
-        subscriptionEnd 
+        subscriptionEnd,
+        cancelAtPeriodEnd
       });
     }
 
@@ -158,7 +161,7 @@ serve(async (req) => {
       stripe_subscription_id: subscriptions.data[0]?.id || null,
       trial_end: trialEnd,
       current_period_end: subscriptionEnd,
-      cancel_at_period_end: false, // Reset this field when updating
+      cancel_at_period_end: cancelAtPeriodEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' });
 
@@ -174,7 +177,8 @@ serve(async (req) => {
       plan_name: planName,
       in_trial: inTrial,
       trial_end: trialEnd,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      cancel_at_period_end: cancelAtPeriodEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

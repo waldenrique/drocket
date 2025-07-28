@@ -114,9 +114,12 @@ serve(async (req) => {
       // Check if there are any subscriptions that are already cancelled
       const alreadyCancelled = subscriptions.data.filter(sub => sub.cancel_at_period_end);
       if (alreadyCancelled.length > 0) {
+        const cancelDate = new Date(alreadyCancelled[0].current_period_end * 1000);
         return new Response(JSON.stringify({ 
           error: "Sua assinatura já está programada para cancelamento no final do período atual.",
-          cancelAt: new Date(alreadyCancelled[0].current_period_end * 1000)
+          message: `Sua assinatura expirará em ${cancelDate.toLocaleDateString('pt-BR')}. Você ainda pode usar os recursos premium até lá.`,
+          cancelAt: cancelDate,
+          alreadyCancelled: true
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 400,

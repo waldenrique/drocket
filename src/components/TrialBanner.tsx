@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Crown } from "lucide-react";
 
 export default function TrialBanner() {
-  const { subscription, isInTrial, isFree } = useSubscription();
+  const { subscription, isInTrial, isFree, isCancelled } = useSubscription();
   const navigate = useNavigate();
 
   const getTrialDaysRemaining = () => {
@@ -19,9 +19,34 @@ export default function TrialBanner() {
 
   const trialDaysRemaining = getTrialDaysRemaining();
 
-  // Only show banner if user is in trial and has 5 or fewer days remaining, or if user is free plan
-  if ((!isInTrial || trialDaysRemaining > 5) && !isFree) {
+  // Only show banner if user is in trial and has 5 or fewer days remaining, if user is free plan, or if subscription is cancelled
+  if ((!isInTrial || trialDaysRemaining > 5) && !isFree && !isCancelled) {
     return null;
+  }
+
+  // Show cancellation notice if subscription is cancelled
+  if (isCancelled && subscription?.subscription_end) {
+    const endDate = new Date(subscription.subscription_end);
+    const now = new Date();
+    const daysRemaining = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    return (
+      <Alert className="mb-4 border-red-200 bg-red-50">
+        <AlertTriangle className="h-4 w-4 text-red-600" />
+        <AlertDescription className="text-red-800 flex items-center justify-between">
+          <span>
+            <strong>Assinatura cancelada.</strong> Você ainda tem acesso premium por {daysRemaining} dias até {endDate.toLocaleDateString('pt-BR')}.
+          </span>
+          <Button 
+            size="sm" 
+            onClick={() => navigate("/pricing")}
+            className="ml-4"
+          >
+            Renovar
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   if (isFree) {

@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Profile() {
-  const { subscription, loading, user, isPremium, isFree, isInTrial, refreshSubscription } = useSubscription();
+  const { subscription, loading, user, isPremium, isFree, isInTrial, isCancelled, refreshSubscription } = useSubscription();
   const [profile, setProfile] = useState<any>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const navigate = useNavigate();
@@ -209,6 +209,11 @@ export default function Profile() {
                     Período de Teste
                   </Badge>
                 )}
+                {isCancelled && (
+                  <Badge variant="destructive">
+                    Cancelada
+                  </Badge>
+                )}
               </div>
 
               {isInTrial && (
@@ -223,7 +228,7 @@ export default function Profile() {
               {isPremium && subscription?.subscription_end && (
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">
-                    {subscription?.cancel_at_period_end ? "Cancela em" : "Renova em"}
+                    {isCancelled ? "Expira em" : "Renova em"}
                   </label>
                   <p className="font-medium">{formatDate(subscription.subscription_end)}</p>
                 </div>
@@ -242,17 +247,22 @@ export default function Profile() {
                       <Settings className="h-4 w-4 mr-2" />
                       Gerenciar Assinatura
                     </Button>
-                    {!subscription?.cancel_at_period_end && (
+                    {!isCancelled && (
                       <Button variant="destructive" onClick={handleCancelSubscription} className="flex-1">
                         Cancelar Assinatura
+                      </Button>
+                    )}
+                    {isCancelled && (
+                      <Button onClick={() => navigate("/pricing")} className="flex-1">
+                        Renovar Assinatura
                       </Button>
                     )}
                   </>
                 )}
                 
-                {subscription?.cancel_at_period_end && (
-                  <div className="text-sm text-orange-600 bg-orange-50 p-2 rounded">
-                    Sua assinatura será cancelada em {formatDate(subscription.subscription_end)}
+                {isCancelled && (
+                  <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">
+                    <strong>Assinatura cancelada.</strong> Você ainda tem acesso aos recursos premium até {formatDate(subscription.subscription_end)}.
                   </div>
                 )}
               </div>

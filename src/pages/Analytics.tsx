@@ -96,7 +96,7 @@ const Analytics = () => {
           country,
           referrer,
           link_id,
-          links!inner(title, url)
+          links(title, url)
         `)
         .in('page_id', pageIds)
         .gte('created_at', daysAgo.toISOString());

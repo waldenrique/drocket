@@ -163,6 +163,32 @@ const Index = () => {
     
     setLinksLoading(true);
     try {
+      // Verificar limite de links antes de criar (apenas para novos links)
+      if (!editingLink) {
+        const { data: canAdd, error: limitError } = await supabase.functions.invoke('check-subscription');
+        
+        if (limitError) {
+          console.error('Erro ao verificar limite:', limitError);
+          // Continuar mesmo com erro de verificação para não bloquear usuários premium
+        } else if (canAdd && !canAdd.subscribed) {
+          // Usuário free: verificar limite na base de dados
+          const { data: linkCount } = await supabase
+            .from('links')
+            .select('id', { count: 'exact' })
+            .eq('page_id', page.id);
+          
+          if (linkCount && linkCount.length >= 2) {
+            toast({
+              title: "Limite atingido",
+              description: "Usuários gratuitos podem criar apenas 2 links. Faça upgrade para Premium!",
+              variant: "destructive"
+            });
+            setLinksLoading(false);
+            return;
+          }
+        }
+      }
+      
       let url = data.url;
       
       // Add https:// if no protocol is provided
@@ -198,7 +224,24 @@ const Index = () => {
           .from('links')
           .insert(linkData);
         
-        if (error) throw error;
+        if (error) {
+          // Verificar se é erro de limite
+          if (error.message && error.message.includes('Link limit exceeded')) {
+            toast({
+              title: "Limite atingido",
+              description: "Limite de links atingido para seu plano. Faça upgrade para Premium!",
+              variant: "destructive",
+              action: (
+                <Button variant="outline" size="sm" onClick={() => navigate('/pricing')}>
+                  Ver Planos
+                </Button>
+              )
+            });
+            setLinksLoading(false);
+            return;
+          }
+          throw error;
+        }
         
         toast({
           title: "Sucesso",
@@ -964,10 +1007,16 @@ const Index = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
-                    <span>Links da página</span>
+                    <div className="flex flex-col gap-1">
+                      <span>Links da página</span>
+                      <div className="text-sm font-normal text-muted-foreground">
+                        {links.length}/2 links utilizados (Plano Gratuito)
+                      </div>
+                    </div>
                     <Button
                       size="sm"
                       onClick={() => setShowLinkForm(true)}
+                      disabled={links.length >= 2}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Adicionar link
@@ -975,6 +1024,14 @@ const Index = () => {
                   </CardTitle>
                   <CardDescription>
                     Gerencie os links que aparecerão na sua página
+                    {links.length >= 2 && (
+                      <div className="mt-2 p-2 bg-orange-50 text-orange-800 rounded text-sm">
+                        Limite atingido! Faça upgrade para Premium para links ilimitados.
+                        <Button variant="link" size="sm" onClick={() => navigate('/pricing')} className="p-0 h-auto text-orange-600 underline ml-1">
+                          Ver planos
+                        </Button>
+                      </div>
+                    )}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

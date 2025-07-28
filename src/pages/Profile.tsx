@@ -47,23 +47,47 @@ export default function Profile() {
 
   const handleManageSubscription = async () => {
     try {
+      console.log("Calling customer-portal function...");
       const { data, error } = await supabase.functions.invoke("customer-portal");
-      if (error) throw error;
-      window.open(data.url, "_blank");
+      
+      console.log("Customer portal response:", { data, error });
+      
+      if (error) {
+        console.error("Customer portal error:", error);
+        throw error;
+      }
+      
+      if (data?.url) {
+        console.log("Opening customer portal URL:", data.url);
+        window.open(data.url, "_blank");
+      } else {
+        throw new Error("Nenhuma URL retornada do portal");
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error in handleManageSubscription:", error);
       toast({
         title: "Erro",
-        description: "Erro ao abrir portal de gerenciamento",
+        description: error.message || "Erro ao abrir portal de gerenciamento",
         variant: "destructive",
       });
     }
   };
 
   const handleCancelSubscription = async () => {
+    if (!confirm('Tem certeza que deseja cancelar sua assinatura? Ela será cancelada no final do período atual.')) {
+      return;
+    }
+
     try {
+      console.log("Calling cancel-subscription function...");
       const { data, error } = await supabase.functions.invoke("cancel-subscription");
-      if (error) throw error;
+      
+      console.log("Cancel subscription response:", { data, error });
+      
+      if (error) {
+        console.error("Cancel subscription error:", error);
+        throw error;
+      }
       
       toast({
         title: "Assinatura cancelada",
@@ -72,10 +96,10 @@ export default function Profile() {
       
       await refreshSubscription();
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error in handleCancelSubscription:", error);
       toast({
         title: "Erro",
-        description: "Erro ao cancelar assinatura",
+        description: error.message || "Erro ao cancelar assinatura",
         variant: "destructive",
       });
     }

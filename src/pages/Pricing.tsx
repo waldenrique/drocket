@@ -45,11 +45,8 @@ const Pricing = () => {
 
   const handleUpgrade = async (plan: 'monthly' | 'yearly') => {
     if (!user) {
-      toast({
-        title: "Faça login",
-        description: "Você precisa estar logado para assinar um plano.",
-        variant: "destructive",
-      });
+      // Redireciona para cadastro com plano pré-selecionado
+      window.location.href = `/auth?plan=${plan}`;
       return;
     }
 

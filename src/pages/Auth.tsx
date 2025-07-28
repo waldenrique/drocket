@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Link2 } from "lucide-react";
+import { Loader2, Link2, Crown } from "lucide-react";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,19 +16,57 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Detecta plano selecionado na URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const plan = urlParams.get('plan');
+    if (plan === 'monthly' || plan === 'yearly') {
+      setSelectedPlan(plan);
+    }
+  }, []);
 
   useEffect(() => {
     // Check if user is already logged in
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/");
+        // Se tem plano selecionado e está logado, faz checkout
+        if (selectedPlan) {
+          handlePlanCheckout(selectedPlan);
+        } else {
+          navigate("/");
+        }
       }
     };
     checkUser();
-  }, [navigate]);
+  }, [navigate, selectedPlan]);
+
+  // Função para fazer checkout do plano
+  const handlePlanCheckout = async (plan: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plan }
+      });
+      
+      if (error) throw error;
+      
+      // Remove o parâmetro da URL e redireciona para o Stripe
+      window.history.replaceState({}, document.title, "/auth");
+      window.open(data.url, '_blank');
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao processar pagamento",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,6 +184,16 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-primary/5 p-4">
       <div className="w-full max-w-md space-y-4">
+        {/* Selected Plan Badge */}
+        {selectedPlan && (
+          <div className="text-center">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+              <Crown className="w-4 h-4 mr-2" />
+              Plano selecionado: {selectedPlan === 'monthly' ? 'Premium Mensal' : 'Premium Anual'}
+            </Badge>
+          </div>
+        )}
+
         {/* Header with pricing link */}
         <div className="text-center">
           <Button 

@@ -11,6 +11,7 @@ import { Link2, LogOut, Plus, Edit, Eye, Trash2, GripVertical, ExternalLink, Tog
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import PageCustomization from "@/components/PageCustomization";
+import ImageUpload from "@/components/ImageUpload";
 
 interface PageFormData {
   title: string;
@@ -39,6 +40,7 @@ const Index = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [pageLoading, setPageLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [links, setLinks] = useState<Link[]>([]);
@@ -86,6 +88,7 @@ const Index = () => {
   const loadUserPage = async (userId: string) => {
     setPageLoading(true);
     try {
+      // Load user page
       const { data, error } = await supabase
         .from('pages')
         .select('*')
@@ -98,6 +101,17 @@ const Index = () => {
       }
       
       setPage(data);
+      
+      // Load user profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (profileData) {
+        setProfile(profileData);
+      }
       
       // Se existe página, preencher o formulário e carregar links
       if (data) {
@@ -588,7 +602,24 @@ const Index = () => {
                       <p className="text-sm text-muted-foreground">
                         Opcional: ajude os visitantes a entender do que se trata a sua página
                       </p>
-                    </div>
+                     </div>
+
+                     {/* Upload de foto de perfil */}
+                     <ImageUpload
+                       currentImageUrl={profile?.avatar_url}
+                       onImageUploaded={(url) => {
+                         setProfile(prev => ({ ...prev, avatar_url: url }));
+                         toast({
+                           title: "Sucesso!",
+                           description: "Foto atualizada! Ela aparecerá na sua página pública.",
+                         });
+                       }}
+                       onImageRemoved={() => {
+                         setProfile(prev => ({ ...prev, avatar_url: null }));
+                       }}
+                       label="Foto de perfil / Logo"
+                       placeholder="Adicione uma foto que representará você na página pública"
+                     />
 
                     <div className="flex gap-3 pt-4">
                       <Button type="submit" disabled={pageLoading}>

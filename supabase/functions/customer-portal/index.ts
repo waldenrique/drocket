@@ -12,6 +12,39 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CUSTOMER-PORTAL] ${step}${detailsStr}`);
 };
 
+// Rate limiting store (simple in-memory)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+const checkRateLimit = (identifier: string, maxRequests = 5, windowMs = 60000): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitStore.get(identifier);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+  
+  if (userLimit.count >= maxRequests) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+};
+
+const sanitizeError = (error: any): string => {
+  // Don't expose internal errors
+  const safeErrors = [
+    "User not authenticated",
+    "No Stripe customer found for this user"
+  ];
+  
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  return safeErrors.some(safe => errorMessage.includes(safe)) 
+    ? errorMessage 
+    : "An error occurred while accessing the customer portal";
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,21 +53,31 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
+    // Rate limiting check
+    const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    if (!checkRateLimit(`customer-portal:${clientIP}`, 5, 60000)) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
 
+    // Authentication
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
+    if (!authHeader) throw new Error("User not authenticated");
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    if (userError) throw new Error("User not authenticated");
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
     
@@ -59,9 +102,13 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in customer-portal", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const sanitizedError = sanitizeError(error);
+    logStep("ERROR in customer-portal", { 
+      message: error instanceof Error ? error.message : String(error),
+      sanitized: sanitizedError 
+    });
+    
+    return new Response(JSON.stringify({ error: sanitizedError }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

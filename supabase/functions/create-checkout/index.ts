@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,51 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
+
+// Input validation schema
+const createCheckoutSchema = z.object({
+  plan: z.enum(['monthly', 'yearly'], {
+    errorMap: () => ({ message: "Plan must be either 'monthly' or 'yearly'" })
+  })
+});
+
+// Rate limiting store (simple in-memory)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+const checkRateLimit = (identifier: string, maxRequests = 10, windowMs = 60000): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitStore.get(identifier);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+  
+  if (userLimit.count >= maxRequests) {
+    return false;
+  }
+  
+  userLimit.count++;
+  return true;
+};
+
+const sanitizeError = (error: any): string => {
+  if (error instanceof z.ZodError) {
+    return error.errors[0]?.message || "Invalid input data";
+  }
+  
+  // Don't expose internal errors
+  const safeErrors = [
+    "Invalid plan selected",
+    "User not authenticated", 
+    "No active price found for the selected product"
+  ];
+  
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  return safeErrors.some(safe => errorMessage.includes(safe)) 
+    ? errorMessage 
+    : "An error occurred while processing your request";
 };
 
 serve(async (req) => {
@@ -25,15 +71,32 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { plan } = await req.json();
+    // Rate limiting check
+    const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    if (!checkRateLimit(`create-checkout:${clientIP}`, 5, 60000)) {
+      return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
+    }
+
+    // Input validation
+    const requestBody = await req.json();
+    const validatedInput = createCheckoutSchema.parse(requestBody);
+    const { plan } = validatedInput;
     logStep("Plan requested", { plan });
 
-    const authHeader = req.headers.get("Authorization")!;
+    // Authentication
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("User not authenticated");
+    
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
+    const { data, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError) throw new Error("User not authenticated");
+    
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2023-10-16" });
     
@@ -99,11 +162,16 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const sanitizedError = sanitizeError(error);
+    logStep("ERROR in create-checkout", { 
+      message: error instanceof Error ? error.message : String(error),
+      sanitized: sanitizedError 
+    });
+    
+    const status = error instanceof z.ZodError ? 400 : 500;
+    return new Response(JSON.stringify({ error: sanitizedError }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status,
     });
   }
 });

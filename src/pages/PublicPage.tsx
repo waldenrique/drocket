@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ExternalLink, User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Link {
@@ -16,6 +17,12 @@ interface Link {
   click_count: number;
 }
 
+interface Profile {
+  display_name?: string;
+  bio?: string;
+  avatar_url?: string;
+}
+
 interface Page {
   id: string;
   title: string;
@@ -23,11 +30,13 @@ interface Page {
   background_type: string;
   background_value: string;
   theme_color: string;
+  user_id: string;
 }
 
 const PublicPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [page, setPage] = useState<Page | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -57,6 +66,17 @@ const PublicPage = () => {
       }
 
       setPage(pageData);
+
+      // Load user profile information
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('display_name, bio, avatar_url')
+        .eq('user_id', pageData.user_id)
+        .maybeSingle();
+
+      if (profileData) {
+        setProfile(profileData);
+      }
 
       // Load active links for this page
       const { data: linksData, error: linksError } = await supabase
@@ -135,65 +155,111 @@ const PublicPage = () => {
 
   return (
     <div 
-      className="min-h-screen py-6 sm:py-8 px-4"
+      className="min-h-screen relative overflow-hidden"
       style={backgroundStyle}
     >
-      <div className="max-w-sm sm:max-w-md mx-auto">
-        {/* Page Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-bold mb-2 text-white drop-shadow-lg">
-            {page.title}
-          </h1>
-          {page.description && (
-            <p className="text-sm sm:text-base text-white/90 drop-shadow">
-              {page.description}
-            </p>
-          )}
-        </div>
+      {/* Background Overlay */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[1px]"></div>
+      
+      {/* Content */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center py-8 px-4">
+        <div className="w-full max-w-md mx-auto">
+          {/* Profile Header */}
+          <div className="text-center mb-8 animate-fade-in">
+            {/* Avatar */}
+            <div className="mb-6 flex justify-center">
+              <Avatar className="h-24 w-24 ring-4 ring-white/20 shadow-2xl">
+                <AvatarImage 
+                  src={profile?.avatar_url} 
+                  alt={profile?.display_name || page.title}
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-white/10 text-white text-2xl font-bold backdrop-blur">
+                  {profile?.display_name ? 
+                    profile.display_name.charAt(0).toUpperCase() : 
+                    page.title.charAt(0).toUpperCase()
+                  }
+                </AvatarFallback>
+              </Avatar>
+            </div>
 
-        {/* Links */}
-        <div className="space-y-3 sm:space-y-4">
-          {links.length === 0 ? (
-            <Card className="bg-white/10 backdrop-blur border-white/20">
-              <CardContent className="p-6 text-center">
-                <p className="text-white/80">Nenhum link disponível no momento.</p>
-              </CardContent>
-            </Card>
-          ) : (
-            links.map((link) => (
-              <Card 
-                key={link.id}
-                className="bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 transition-all cursor-pointer group"
-                onClick={() => handleLinkClick(link)}
-              >
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                      {link.icon && (
-                        <span className="text-xl sm:text-2xl flex-shrink-0">{link.icon}</span>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm sm:text-base font-medium text-white group-hover:text-white/90 truncate">
-                          {link.title}
-                        </h3>
-                        <p className="text-xs sm:text-sm text-white/60 truncate">
-                          {link.url.replace(/^https?:\/\//, '')}
-                        </p>
-                      </div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5 text-white/60 group-hover:text-white/80 flex-shrink-0" />
-                  </div>
+            {/* Name and Bio */}
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
+                {profile?.display_name || page.title}
+              </h1>
+              {(profile?.bio || page.description) && (
+                <p className="text-base text-white/90 drop-shadow max-w-sm mx-auto leading-relaxed">
+                  {profile?.bio || page.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Links Container */}
+          <div className="space-y-4">
+            {links.length === 0 ? (
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-xl animate-fade-in">
+                <CardContent className="p-8 text-center">
+                  <User className="h-12 w-12 text-white/60 mx-auto mb-4" />
+                  <p className="text-white/80 text-lg">Em breve, novos links!</p>
+                  <p className="text-white/60 text-sm mt-2">Esta página está sendo preparada.</p>
                 </CardContent>
               </Card>
-            ))
-          )}
-        </div>
+            ) : (
+              links.map((link, index) => (
+                <Card 
+                  key={link.id}
+                  className="group bg-white/15 hover:bg-white/25 backdrop-blur-md border-white/30 
+                           shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer 
+                           hover:scale-[1.02] hover:border-white/50 animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  onClick={() => handleLinkClick(link)}
+                >
+                  <CardContent className="p-5">
+                    <div className="flex items-center space-x-4">
+                      {/* Icon */}
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center 
+                                    group-hover:bg-white/30 transition-colors duration-300">
+                        {link.icon ? (
+                          <span className="text-2xl">{link.icon}</span>
+                        ) : (
+                          <ExternalLink className="h-6 w-6 text-white/80" />
+                        )}
+                      </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8 sm:mt-12">
-          <p className="text-white/60 text-xs sm:text-sm">
-            Criado com RocketLink
-          </p>
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-white group-hover:text-white/95 
+                                     transition-colors duration-300 truncate mb-1">
+                          {link.title}
+                        </h3>
+                        <p className="text-white/70 text-sm truncate">
+                          {link.url.replace(/^https?:\/\//, '').replace(/^www\./, '')}
+                        </p>
+                      </div>
+
+                      {/* Arrow Icon */}
+                      <div className="flex-shrink-0">
+                        <ExternalLink className="h-5 w-5 text-white/60 group-hover:text-white/90 
+                                               group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '600ms' }}>
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md 
+                          rounded-full px-4 py-2 border border-white/20">
+              <span className="text-white/70 text-sm font-medium">
+                Criado com RocketLink
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

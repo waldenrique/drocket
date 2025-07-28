@@ -48,6 +48,21 @@ const PublicPage = () => {
     }
   }, [slug]);
 
+  const trackPageView = async (pageId: string) => {
+    try {
+      await supabase
+        .from('analytics')
+        .insert({
+          event_type: 'view',
+          page_id: pageId,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent
+        });
+    } catch (error) {
+      console.error('Error tracking page view:', error);
+    }
+  };
+
   const loadPublicPage = async () => {
     try {
       setLoading(true);
@@ -66,6 +81,9 @@ const PublicPage = () => {
       }
 
       setPage(pageData);
+
+      // Track page view
+      trackPageView(pageData.id);
 
       // Load user profile information
       const { data: profileData, error: profileError } = await supabase
@@ -106,7 +124,7 @@ const PublicPage = () => {
       await supabase
         .from('analytics')
         .insert({
-          event_type: 'link_click',
+          event_type: 'click',
           page_id: page?.id,
           link_id: link.id,
           referrer: document.referrer || null,
